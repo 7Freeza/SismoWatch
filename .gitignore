@@ -1,0 +1,12 @@
+.env
+AGENTS.md
+*.log
+__pycache__/
+.pytest_cache/
+.venv/
+node_modules/
+dist/
+airflow/logs/
+*.pyc
+.DS_Store
+*.tsbuildinfo

@@ -1,0 +1,138 @@
+x-airflow-common: &airflow-common
+  image: sismowatch-airflow:latest
+  environment: &airflow-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${AIRFLOW_DB_PASSWORD}@postgres:5432/airflow
+    AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "False"
+    AIRFLOW__CORE__PARALLELISM: "4"
+    AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG: "4"
+    AIRFLOW__CORE__DEFAULT_TIMEZONE: UTC
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
+    AIRFLOW__WEBSERVER__WORKERS: "1"
+    AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth
+    AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL: "30"
+    AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL: "30"
+    AIRFLOW__SCHEDULER__PARSING_PROCESSES: "1"
+    PYTHONDONTWRITEBYTECODE: "1"
+    PYTHONPATH: /opt/airflow:/opt/airflow/include
+    DB_DSN_INGEST: postgresql://ingest_writer:${INGEST_DB_PASSWORD}@postgres:5432/sismowatch
+    DB_DSN_TRANSFORM: postgresql://transform_writer:${TRANSFORM_DB_PASSWORD}@postgres:5432/sismowatch
+    USGS_FEED_URL: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson
+    USGS_QUERY_URL: https://earthquake.usgs.gov/fdsnws/event/1/query
+    OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
+    OLLAMA_MODEL: ${OLLAMA_MODEL}
+    LLM_TIMEOUT_SECONDS: ${LLM_TIMEOUT_SECONDS}
+    ALERT_WEBHOOK_URL: ${ALERT_WEBHOOK_URL:-}
+  volumes:
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/include:/opt/airflow/include
+    - ./airflow/tests:/opt/airflow/tests
+  dns:
+    - 8.8.8.8
+    - 1.1.1.1
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+      AIRFLOW_DB_PASSWORD: ${AIRFLOW_DB_PASSWORD}
+      INGEST_DB_PASSWORD: ${INGEST_DB_PASSWORD}
+      TRANSFORM_DB_PASSWORD: ${TRANSFORM_DB_PASSWORD}
+      READER_DB_PASSWORD: ${READER_DB_PASSWORD}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      VIEWER_EMAIL: ${VIEWER_EMAIL}
+      VIEWER_PASSWORD: ${VIEWER_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  airflow-init:
+    <<: *airflow-common
+    build: ./airflow
+    environment:
+      <<: *airflow-env
+      AIRFLOW_ADMIN_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD}
+    command: bash -c "airflow db migrate && (airflow users list | grep -q '^admin ' || airflow users create --username admin --firstname Admin --lastname SismoWatch --role Admin --email admin@sismowatch.local --password $${AIRFLOW_ADMIN_PASSWORD})"
+    restart: "no"
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  api:
+    build: ./api
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      DB_DSN_READER: postgresql+psycopg2://api_reader:${READER_DB_PASSWORD}@postgres:5432/sismowatch
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRE_MINUTES: "480"
+      CORS_ORIGINS: ${WEB_ORIGIN}
+      AIRFLOW_BASE_URL: http://airflow-webserver:8080
+      AIRFLOW_API_USER: ${AIRFLOW_API_USER}
+      AIRFLOW_API_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
+      OLLAMA_MODEL: ${OLLAMA_MODEL}
+      OLLAMA_ANSWER_MODEL: ${OLLAMA_ANSWER_MODEL}
+      LLM_TIMEOUT_SECONDS: ${LLM_TIMEOUT_SECONDS}
+      AI_ENABLED: "true"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build: ./web
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  pgdata:
