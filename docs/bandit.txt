@@ -1,0 +1,206 @@
+[main]	INFO	profile include tests: None
+[main]	INFO	profile exclude tests: None
+[main]	INFO	cli include tests: None
+[main]	INFO	cli exclude tests: None
+[main]	INFO	running on Python 3.12.16
+Run started:2026-10-27 15:38:33.609404
+
+Test results:
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/nl_agent.py:111:12
+110	        return (
+111	            "SELECT count(*) AS eventos_con_tsunami FROM curated.events "
+112	            f"WHERE tsunami = true AND event_time >= now() - interval '{window} hours'"
+113	        )
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/nl_agent.py:126:12
+125	        return (
+126	            "SELECT id, mag, place, event_time FROM curated.events "
+127	            f"WHERE event_time >= now() - interval '{window} hours' "
+128	            "ORDER BY mag DESC LIMIT 1"
+129	        )
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/nl_agent.py:132:12
+131	        return (
+132	            "SELECT id, mag, place, event_time FROM curated.events "
+133	            f"WHERE event_time >= now() - interval '{window} hours' "
+134	            "ORDER BY mag DESC LIMIT 1"
+135	        )
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/nl_agent.py:140:12
+139	        return (
+140	            "SELECT round(avg(mag), 2) AS magnitud_promedio FROM curated.events "
+141	            f"WHERE event_time >= now() - interval '{window} hours'"
+142	        )
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/nl_agent.py:147:12
+146	        return (
+147	            "SELECT id, depth_km, mag, place, event_time FROM curated.events "
+148	            f"WHERE event_time >= now() - interval '{window} hours' "
+149	            "ORDER BY depth_km DESC LIMIT 1"
+150	        )
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/nl_agent.py:153:12
+152	        return (
+153	            "SELECT count(*) AS eventos_significativos FROM curated.events "
+154	            f"WHERE significant = true AND event_time >= now() - interval '{window} hours'"
+155	        )
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/nl_agent.py:160:12
+159	        return (
+160	            "SELECT count(*) AS eventos FROM curated.events "
+161	            f"WHERE event_time >= now() - interval '{window} hours'"
+162	        )
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/nl_agent.py:165:12
+164	        return (
+165	            "SELECT id, place, region, mag, event_time FROM curated.events "
+166	            f"WHERE event_time >= now() - interval '{window} hours' "
+167	            "ORDER BY event_time DESC LIMIT 10"
+168	        )
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/nl_agent.py:175:12
+174	        return (
+175	            "SELECT id, mag, place, region, event_time FROM curated.events "
+176	            f"{window_filter}ORDER BY event_time DESC LIMIT {limit}"
+177	        )
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b110_try_except_pass.html
+   Location: app/nl_agent.py:292:4
+291	            )
+292	    except Exception:
+293	        pass
+294	
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/routers/events.py:60:15
+59	    total = db.execute(
+60	        text(f"SELECT count(*) FROM curated.events {where}"), params
+61	    ).scalar_one()
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/routers/events.py:65:20
+64	            text(
+65	                f"""
+66	                SELECT
+67	                    id, mag, place, region, event_time, updated_time, tsunami,
+68	                    significance, status, mag_type, event_type, url, longitude,
+69	                    latitude, depth_km, significant, updated_at
+70	                FROM curated.events
+71	                {where}
+72	                ORDER BY {SORT_COLUMNS[sort]} {order.upper()} NULLS LAST, id
+73	                LIMIT :limit OFFSET :offset
+74	                """
+75	            ),
+
+--------------------------------------------------
+>> Issue: [B406:blacklist] Using escape to parse untrusted XML data is known to be vulnerable to XML attacks. Replace escape with the equivalent defusedxml package, or make sure defusedxml.defuse_stdlib() is called.
+   Severity: Low   Confidence: High
+   CWE: CWE-20 (https://cwe.mitre.org/data/definitions/20.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/blacklists/blacklist_imports.html#b406-import-xml-sax
+   Location: app/routers/reports.py:3:0
+2	import io
+3	from xml.sax.saxutils import escape
+4	
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/routers/reports.py:47:30
+46	        params["q"] = f"%{q}%"
+47	    total = db.execute(text(f"SELECT count(*) FROM ai.reports {where}"), params).scalar_one()
+48	    rows = (
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.0/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/routers/reports.py:51:20
+50	            text(
+51	                f"""
+52	                SELECT id, report_date, title, summary, highlights, statistics,
+53	                       model, prompt_version, status, numbers_valid, generated_at
+54	                FROM ai.reports
+55	                {where}
+56	                ORDER BY {SORT_COLUMNS[sort]} {order.upper()}
+57	                LIMIT :limit OFFSET :offset
+58	                """
+59	            ),
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 1837
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 2
+		Medium: 13
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 13
+		Medium: 0
+		High: 2
+Files skipped (0):
