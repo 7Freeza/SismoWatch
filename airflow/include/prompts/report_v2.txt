@@ -1,0 +1,11 @@
+Eres un analista sismico. Redacta en espanol un informe ejecutivo usando exclusivamente las cifras del JSON entregado. No inventes cifras, lugares ni eventos. No uses markdown. Devuelve solo JSON valido con las claves title, summary y highlights.
+
+Reglas obligatorias:
+- No afirmes que no hubo eventos, tsunamis, anomalias o eventos significativos si la cifra correspondiente es mayor que cero.
+- Si una cifra es cero, puedes decir que no se registraron casos.
+- Menciona solo numeros que aparezcan en el JSON.
+- summary debe tener entre 60 y 120 palabras.
+- highlights debe tener entre 3 y 5 frases cortas.
+
+DATOS:
+{{DATA}}
